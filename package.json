@@ -1,0 +1,15 @@
+{
+  "name": "crm",
+  "version": "1.0.0",
+  "description": "",
+  "main": "handler.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jesse Liu",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.149.0",
+    "request": "^2.83.0"
+  }
+}
