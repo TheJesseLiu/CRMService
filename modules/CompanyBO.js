@@ -28,3 +28,18 @@ exports.create = function(company) {
 
     });
 };
+
+exports.getByID = function(company_id) {
+    return new Promise(function(resolve, reject) {
+        CompanyDO.getByID(company_id).then(
+            function(result) {
+                // console.log(result); 
+                resolve(result);
+            },
+            function(error) {
+                resolve(error);
+            }
+        );
+    });
+};
+

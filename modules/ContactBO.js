@@ -28,3 +28,17 @@ exports.create = function(contact) {
 
     });
 };
+
+exports.getAll = function(queryStringParameters){
+    return new Promise(function(resolve, reject) {
+        ContactDO.getAll(queryStringParameters).then(
+            function(result) {
+                // console.log(result);
+                resolve(result);
+            },
+            function(error) {
+                reject(error);
+            }
+        );
+    });    
+}

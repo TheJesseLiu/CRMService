@@ -1,9 +1,15 @@
 var AWS = require("aws-sdk");
+var COMPANY_URL = process.env.COMPANY_URL;
 
+function addHateoas(item){
+    item["links"] = [
+        {"rel":"self", "href":COMPANY_URL+'/'+item.company_id},
+    ];
+}
 
 exports.create = function(company) {
     return new Promise(function(resolve, reject) {
-        var ddb = new AWS.DynamoDB.DocumentClient();
+        let ddb = new AWS.DynamoDB.DocumentClient();
         company["company_id"] = createID(company.company_name);
 
         let params = {
@@ -31,5 +37,33 @@ function createID(company_name){
     }
     return hash.toString();
 }
+
+
+exports.getByID = function(company_id) {
+    return new Promise(function(resolve, reject){
+        let ddb = new AWS.DynamoDB.DocumentClient();
+        var params = {
+            TableName:'CompanyTable',
+            Key:{
+                company_id: company_id
+            }
+        };
+        ddb.get(params, function(err, data){
+            if (err) {
+                console.log(err, err.stack);
+                reject(err);
+            }
+            else {
+                if(data.length!=0){
+                    addHateoas(data.Item);
+                    // console.log(data.Item);
+                    resolve(data.Item);
+                }
+            }
+        });
+    });
+};
+
+
 
 

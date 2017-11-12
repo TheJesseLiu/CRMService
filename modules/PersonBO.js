@@ -18,3 +18,20 @@ exports.create = function(person) {
 		);
     });
 };
+
+exports.getByUrl = function(person_url) {
+    return new Promise(function(resolve, reject) {
+		request.get(
+		    person_url,
+		    function (error, response, body) {
+		    	if(response.statusCode!=200){
+		    		console.log(body);
+		    		reject(body);
+		    	}
+		    	else{
+		    		resolve(JSON.parse(body).Item);
+		    	}
+		    }
+		);
+    });
+};

@@ -2,14 +2,14 @@
 var CRM = require('./CRM');
 
 const collectionHandlers = {
-    "GET": getAllCompanies,
-    "POST": createCompany,
+    "GET": getAllContacts,
+    "POST": createContact,
 }
 
 const itemHandlers = {
-    // "DELETE": deleteCompany,
-    // "GET": getCompany,
-    // "PUT": updateCompany,
+    "DELETE": deleteContact,
+    "GET": getContact,
+    "PUT": updateContact,
 }
 
 module.exports.router = (event, context, callback) => {
@@ -32,8 +32,8 @@ module.exports.router = (event, context, callback) => {
 };
 
 
-function createCompany(event, context, callback) {
-	CRM.createCompany(event.body).then(
+function createContact(event, context, callback) {
+	CRM.createContact(event.body).then(
 	    function (result) {
 			const response = {
 				statusCode: 202,
@@ -61,20 +61,59 @@ function createCompany(event, context, callback) {
 }
 
 
-function getAllCompanies(event, context, callback) {
-	const response = {
-		statusCode: 200,
-		headers: {
-	  		"Access-Control-Allow-Origin" : "*",
-	  		"Access-Control-Allow-Credentials" : true
-			},
-		body: JSON.stringify({ message: "getAllCompanies" })
-	};
-
-	callback(null, response);
+function getAllContacts(event, context, callback) {
+	CRM.getAllContacts(event["queryStringParameters"]).then(
+	    function (result) {
+			const response = {
+				statusCode: 200,
+				headers: {
+			  		"Access-Control-Allow-Origin" : "*",
+			  		"Access-Control-Allow-Credentials" : true
+				},
+				body: JSON.stringify(result)
+			};
+			callback(null, response);
+	    },
+	    function (error) {
+			const response = {
+				statusCode: 400,
+				headers: {
+			  		"Access-Control-Allow-Origin" : "*",
+			  		"Access-Control-Allow-Credentials" : true
+				},
+				body: JSON.stringify({ message: error })
+			};
+			callback(null, response);
+	    }		    	
+	);
 }
 
-
+function getContact(event, context, callback) {
+	CRM.getContact(event["queryStringParameters"]).then(
+	    function (result) {
+			const response = {
+				statusCode: 200,
+				headers: {
+			  		"Access-Control-Allow-Origin" : "*",
+			  		"Access-Control-Allow-Credentials" : true
+				},
+				body: JSON.stringify(result)
+			};
+			callback(null, response);
+	    },
+	    function (error) {
+			const response = {
+				statusCode: 400,
+				headers: {
+			  		"Access-Control-Allow-Origin" : "*",
+			  		"Access-Control-Allow-Credentials" : true
+				},
+				body: JSON.stringify({ message: error })
+			};
+			callback(null, response);
+	    }		    	
+	);
+}
 
 
 
