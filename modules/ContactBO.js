@@ -42,3 +42,27 @@ exports.getAll = function(queryStringParameters){
         );
     });    
 }
+
+
+exports.getByID = function(contact_id) {
+
+    return new Promise(function(resolve, reject) {
+
+        ContactDO.getByID(contact_id).then(
+            function(result) {
+                
+                resolve(result);
+            },
+            function(error) {
+                resolve(error);
+            }
+        );
+    });
+};
+
+
+
+
+
+
+

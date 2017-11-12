@@ -7,9 +7,9 @@ const collectionHandlers = {
 }
 
 const itemHandlers = {
-    "DELETE": deleteContact,
-    "GET": getContact,
-    "PUT": updateContact,
+    // "DELETE": deleteContact,
+    "GET": getContact
+    // "PUT": updateContact
 }
 
 module.exports.router = (event, context, callback) => {
@@ -89,7 +89,7 @@ function getAllContacts(event, context, callback) {
 }
 
 function getContact(event, context, callback) {
-	CRM.getContact(event["queryStringParameters"]).then(
+	CRM.getContact(event).then(
 	    function (result) {
 			const response = {
 				statusCode: 200,

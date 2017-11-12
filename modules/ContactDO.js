@@ -70,6 +70,29 @@ exports.getAll = function(queryStringParameters) {
     });
 };
 
-
+exports.getByID = function(contact_id) {
+    return new Promise(function(resolve, reject){
+        let ddb = new AWS.DynamoDB.DocumentClient();
+        var params = {
+            TableName:'ContactTable',
+            Key:{
+                contact_id: contact_id
+            }
+        };
+        ddb.get(params, function(err, data){
+            if (err) {
+                console.log(err, err.stack);
+                reject(err);
+            }
+            else {
+                if(data.length!=0){
+                    addHateoas(data.Item);
+                    // console.log(data.Item);
+                    resolve(data.Item);
+                }
+            }
+        });
+    });
+};
 
 

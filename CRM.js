@@ -208,16 +208,16 @@ function getAddressesOfContactsTask(contacts) {
 
 
 
-exports.getContact = function(queryStringParameters) {
+exports.getContact = function(event) {
 	return new Promise(function(resolve, reject){
 		// var preconditionSuccess = validateCreateContactReq();
 		// if(!preconditionSuccess){
 		// 	Promise.reject("Precondition Fail");
 		// }
-		getContactTask(queryStringParameters)
-			.then(getCompaniesOfContactsTask, (error) =>{reject(error)})
-			.then(getPersonOfContactsTask, (error) =>{reject(error)})
-			.then(getAddressesOfContactsTask, (error) =>{reject(error)})
+		getContactTask(event)
+			.then(getCompanyOfContactTask, (error) =>{reject(error)})
+			.then(getPersonOfContactTask, (error) =>{reject(error)})
+			.then(getAddressOfContactTask, (error) =>{reject(error)})
 			.then(
 				function(result){
 					console.log(result);
@@ -232,12 +232,72 @@ exports.getContact = function(queryStringParameters) {
 
 };
 
+function getContactTask	(event) {
+	return new Promise(function(resolve, reject){
+		ContactBO.getByID(event["pathParameters"].id)
+			.then(
+				function(result){
+					// console.log(result);
+					resolve(result);
+				},
+				function(error){
+					console.log(error);
+					reject(error);
+				}
+			);
+	});
+}
+
+function getCompanyOfContactTask(contact) {
+	return new Promise(function(resolve, reject){
+		CompanyBO.getByID(contact.company_id)
+			.then(
+				function(result){
+					contact["company"] = result;
+					resolve(contact);
+				},
+				function(error){
+					console.log(error);
+					reject(error);
+				}
+			);
+	});
+}
 
 
+function getPersonOfContactTask(contact) {
+	return new Promise(function(resolve, reject){
+		PersonBO.getByUrl(contact.person_url)
+			.then(
+				function(result){
+					contact["person"] =result;
+					resolve(contact);
+				},
+				function(error){
+					console.log(error);
+					reject(error);
+				}
+			);
+	});
+}
 
 
-
-
+function getAddressOfContactTask(contact) {
+	return new Promise(function(resolve, reject){
+		AddressBO.getByUrl(contact.person.address_url)
+			.then(
+				function(result){
+					console.log(result);
+					contact["address"] =result;
+					resolve(contact);
+				},
+				function(error){
+					console.log(error);
+					reject(error);
+				}
+			);
+	});
+}
 
 
 
