@@ -116,24 +116,36 @@ function createContactTask(createContactReq) {
 
 exports.getAllContacts = function(queryStringParameters) {
 	return new Promise(function(resolve, reject){
-		// var preconditionSuccess = validateCreateContactReq();
-		// if(!preconditionSuccess){
-		// 	Promise.reject("Precondition Fail");
-		// }
 		getAllContactsTask(queryStringParameters)
-			.then(getCompaniesOfContactsTask, (error) =>{reject(error)})
-			.then(getPersonOfContactsTask, (error) =>{reject(error)})
-			.then(getAddressesOfContactsTask, (error) =>{reject(error)})
 			.then(
-				function(result){
+				(result)=>{
 					console.log(result);
-					resolve(result);
+					let promises = [];
+					for(let i=0; i<result.Items.length; i++){
+						promises.push(tryTask(result.Items[i]));
+					}
+					Promise.all(promises).then(function() {
+						console.log(result);
+					    resolve(result);
+					});					
 				},
-				function(error){
-					console.log(error);
+				(error)=>{
 					reject(error);
 				}				
 			);
+			// .then(getCompaniesOfContactsTask, (error) =>{reject(error)})
+			// .then(getPersonOfContactsTask, (error) =>{reject(error)})
+			// .then(getAddressesOfContactsTask, (error) =>{reject(error)})
+			// .then(
+			// 	function(result){
+			// 		console.log(result);
+			// 		resolve(result);
+			// 	},
+			// 	function(error){
+			// 		console.log(error);
+			// 		reject(error);
+			// 	}				
+			// );
 	});
 
 };
@@ -156,56 +168,72 @@ function getAllContactsTask(queryStringParameters) {
 
 
 
-function getCompaniesOfContactsTask(contacts) {
-	let promises = [];
-	return new Promise(function(resolve, reject){
-		for(let i=0; i<contacts.Items.length; i++){
-			promises.push(CompanyBO.getByID(contacts.Items[i].company_id));
-		}
-		Promise.all(promises).then(function() {
-		    for(let i=0; i<contacts.Items.length; i++){
-		    	promises[i].then(
-		    		(result)=>{contacts.Items[i]["company"] =result;} 
-		    	);
-		    }
-		    resolve(contacts);
-		});
-	});
-}
-function getPersonOfContactsTask(contacts) {
-	let promises = [];
-	return new Promise(function(resolve, reject){
-		for(let i=0; i<contacts.Items.length; i++){
-			promises.push(PersonBO.getByUrl(contacts.Items[i].person_url));
-		}
-		Promise.all(promises).then(function() {
-		    for(let i=0; i<contacts.Items.length; i++){
-		    	promises[i].then(
-		    		(result)=>{contacts.Items[i]["person"] =result;} 
-		    	);
-		    }
-		    resolve(contacts);
-		});
-	});
-}
+// function getCompaniesOfContactsTask(contacts) {
+// 	let promises = [];
+// 	return new Promise(function(resolve, reject){
+// 		for(let i=0; i<contacts.Items.length; i++){
+// 			promises.push(CompanyBO.getByID(contacts.Items[i].company_id));
+// 		}
+// 		Promise.all(promises).then(function() {
+// 		    for(let i=0; i<contacts.Items.length; i++){
+// 		    	promises[i].then(
+// 		    		(result)=>{contacts.Items[i]["company"] =result;} 
+// 		    	);
+// 		    }
+// 		    resolve(contacts);
+// 		});
+// 	});
+// }
+// function getPersonOfContactsTask(contacts) {
+// 	let promises = [];
+// 	return new Promise(function(resolve, reject){
+// 		for(let i=0; i<contacts.Items.length; i++){
+// 			promises.push(PersonBO.getByUrl(contacts.Items[i].person_url));
+// 		}
+// 		Promise.all(promises).then(function() {
+// 		    for(let i=0; i<contacts.Items.length; i++){
+// 		    	promises[i].then(
+// 		    		(result)=>{contacts.Items[i]["person"] =result;} 
+// 		    	);
+// 		    }
+// 		    resolve(contacts);
+// 		});
+// 	});
+// }
 
-function getAddressesOfContactsTask(contacts) {
-	let promises = [];
+// function getAddressesOfContactsTask(contacts) {
+// 	let promises = [];
+// 	return new Promise(function(resolve, reject){
+// 		for(let i=0; i<contacts.Items.length; i++){
+// 			promises.push(AddressBO.getByUrl(contacts.Items[i].person.address_url));
+// 		}
+// 		Promise.all(promises).then(function() {
+// 		    for(let i=0; i<contacts.Items.length; i++){
+// 		    	promises[i].then(
+// 		    		(result)=>{contacts.Items[i]["address"] =result;} 
+// 		    	);
+// 		    }
+// 		    resolve(contacts);
+// 		});
+// 	});
+// }
+
+function tryTask(contact) {
 	return new Promise(function(resolve, reject){
-		for(let i=0; i<contacts.Items.length; i++){
-			promises.push(AddressBO.getByUrl(contacts.Items[i].person.address_url));
-		}
-		Promise.all(promises).then(function() {
-		    for(let i=0; i<contacts.Items.length; i++){
-		    	promises[i].then(
-		    		(result)=>{contacts.Items[i]["address"] =result;} 
-		    	);
-		    }
-		    resolve(contacts);
-		});
+		getCompanyOfContactTask(contact)
+			.then(getPersonOfContactTask, (error) =>{reject(error)})
+			.then(getAddressOfContactTask, (error) =>{reject(error)})
+			.then(
+				function(result){
+					resolve(contact);
+				},
+				function(error){
+					console.log(error);
+					reject(error);
+				}				
+			);			
 	});
 }
-
 
 
 exports.getContact = function(event) {
