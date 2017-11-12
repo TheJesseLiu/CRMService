@@ -214,7 +214,7 @@ exports.getContact = function(queryStringParameters) {
 		// if(!preconditionSuccess){
 		// 	Promise.reject("Precondition Fail");
 		// }
-		getAllContactsTask(queryStringParameters)
+		getContactTask(queryStringParameters)
 			.then(getCompaniesOfContactsTask, (error) =>{reject(error)})
 			.then(getPersonOfContactsTask, (error) =>{reject(error)})
 			.then(getAddressesOfContactsTask, (error) =>{reject(error)})
