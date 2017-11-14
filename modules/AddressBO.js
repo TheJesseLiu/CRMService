@@ -13,7 +13,7 @@ exports.create = function(address) {
 		    		reject(body);
 		    	}
 		    	else{
-		    		resolve(body);
+		    		resolve(body.url);
 		    	}
 		    }
 		);

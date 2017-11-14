@@ -61,6 +61,39 @@ exports.getByID = function(contact_id) {
 };
 
 
+exports.deleteByID = function(contact_id) {
+    return new Promise(function(resolve, reject) {
+        ContactDO.deleteByID(contact_id).then(
+            function(result) {
+                resolve(result);
+            },
+            function(error) {
+                resolve(error);
+            }
+        );
+    });
+};
+
+
+
+exports.updateByID = function(contact) {
+    return new Promise(function(resolve, reject) {
+        ContactDO.updateByID(contact).then(
+            function(result) {
+                resolve(result);
+            },
+            function(error) {
+                resolve(error);
+            }
+        );
+    });
+};
+
+
+
+
+
+
 
 
 

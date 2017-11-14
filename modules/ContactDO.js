@@ -96,3 +96,58 @@ exports.getByID = function(contact_id) {
 };
 
 
+
+exports.deleteByID = function(contact_id) {
+    return new Promise(function(resolve, reject){
+        let ddb = new AWS.DynamoDB.DocumentClient();
+        var params = {
+            TableName:'ContactTable',
+            Key:{
+                contact_id: contact_id
+            }
+        };
+        ddb.delete(params, function(err, data) {
+            if (err) {
+                console.log(err);
+                reject(JSON.stringify({"error message":"400 Bad Request or the contact_id should be number"}));
+            }
+            else {
+                resolve(contact_id+" has been deleted.");
+            }
+        });
+    });
+};
+
+
+exports.updateByID = function(contact) {
+    return new Promise(function(resolve, reject){
+        console.log(contact);
+        let ddb = new AWS.DynamoDB.DocumentClient();
+        var params = {
+            TableName:'ContactTable',
+            Key:{
+                contact_id: contact.contact_id
+            },
+            UpdateExpression: "set title =:title, company_id =:company_id",
+            ExpressionAttributeValues:{
+                ":title" : contact.title,
+                ":company_id" : contact.company_id
+            }            
+        };
+        ddb.update(params, function(err, data) {
+            if (err) {
+                console.log(err);
+                reject(JSON.stringify({"error message":"400 Bad Request or the contact_id should be number"}));
+            }
+            else {
+                resolve(contact.contact_id+" has been updated.");
+            }
+        });
+    });
+};
+
+
+
+
+
+

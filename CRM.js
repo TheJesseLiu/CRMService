@@ -328,6 +328,97 @@ function getAddressOfContactTask(contact) {
 }
 
 
+exports.deleteContact = function(event) {
+	return new Promise(function(resolve, reject){
+		deleteContactTask(event)
+			.then(
+				function(result){
+					console.log(result);
+					resolve(result);
+				},
+				function(error){
+					console.log(error);
+					reject(error);
+				}			
+			);
+	});
 
+};
+
+function deleteContactTask	(event) {
+	return new Promise(function(resolve, reject){
+		ContactBO.deleteByID(event["pathParameters"].id)
+			.then(
+				function(result){
+					// console.log(result);
+					resolve(result);
+				},
+				function(error){
+					console.log(error);
+					reject(error);
+				}
+			);
+	});
+}
+
+
+exports.updateContact = function(event) {
+
+	return new Promise(function(resolve, reject){	
+		updateContactReq = JSON.parse(event.body);
+		updateContactReq.contact.contact_id = event["pathParameters"].id;
+		console.log(updateContactReq);
+		createAddressTask(updateContactReq)
+			.then(updatePersonTask, (error) =>{reject(error)})
+			.then(createCompanyTask, (error) =>{reject(error)})
+			.then(updateContactTask, (error) =>{reject(error)})
+			.then(
+				function(result){
+					console.log(result);
+					resolve(result);
+				},
+				function(error){
+					console.log(error);
+					reject(error);
+				}			
+			);
+	});
+};
+
+
+function updatePersonTask(updateContactReq) {
+	return new Promise(function(resolve, reject){
+		PersonBO.update(updateContactReq.person)
+			.then(
+
+				function(result){
+					console.log(updateContactReq);
+					console.log(result);
+					resolve(updateContactReq);
+				},
+				function(error){
+					console.log(updateContactReq);					
+					console.log(error);
+					reject(error);
+				}
+			);
+	});
+}
+
+function updateContactTask	(updateContactReq) {
+	return new Promise(function(resolve, reject){
+		ContactBO.updateByID(updateContactReq.contact)
+			.then(
+				function(result){
+					// console.log(result);
+					resolve(result);
+				},
+				function(error){
+					console.log(error);
+					reject(error);
+				}
+			);
+	});
+}
 
 

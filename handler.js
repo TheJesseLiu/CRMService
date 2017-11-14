@@ -7,14 +7,14 @@ const collectionHandlers = {
 }
 
 const itemHandlers = {
-    // "DELETE": deleteContact,
-    "GET": getContact
-    // "PUT": updateContact
+    "DELETE": deleteContact,
+    "GET": getContact,
+    "PUT": updateContact
 }
 
 module.exports.router = (event, context, callback) => {
 	let handlers = (event["pathParameters"] == null) ? collectionHandlers : itemHandlers;
-	let httpMethod = event["httpMethod"];
+	let httpMethod = event["httpMethod"];ˇ
 	if (httpMethod in handlers) {
 		return handlers[httpMethod](event, context, callback);
 	}
@@ -115,6 +115,58 @@ function getContact(event, context, callback) {
 	);
 }
 
+function deleteContact(event, context, callback) {
+	CRM.deleteContact(event).then(
+	    function (result) {
+			const response = {
+				statusCode: 200,
+				headers: {
+			  		"Access-Control-Allow-Origin" : "*",
+			  		"Access-Control-Allow-Credentials" : true
+				},
+				body: JSON.stringify(result)
+			};
+			callback(null, response);
+	    },
+	    function (error) {
+			const response = {
+				statusCode: 400,
+				headers: {
+			  		"Access-Control-Allow-Origin" : "*",
+			  		"Access-Control-Allow-Credentials" : true
+				},
+				body: JSON.stringify({ message: error })
+			};
+			callback(null, response);
+	    }		    	
+	);
+}
 
 
+function updateContact(event, context, callback) {
+	CRM.updateContact(event).then(
+	    function (result) {
+			const response = {
+				statusCode: 200,
+				headers: {
+			  		"Access-Control-Allow-Origin" : "*",
+			  		"Access-Control-Allow-Credentials" : true
+				},
+				body: JSON.stringify(result)
+			};
+			callback(null, response);
+	    },
+	    function (error) {
+			const response = {
+				statusCode: 400,
+				headers: {
+			  		"Access-Control-Allow-Origin" : "*",
+			  		"Access-Control-Allow-Credentials" : true
+				},
+				body: JSON.stringify({ message: error })
+			};
+			callback(null, response);
+	    }		    	
+	);
+}
 
