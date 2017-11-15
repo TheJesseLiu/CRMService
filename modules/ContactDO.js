@@ -1,6 +1,6 @@
 var AWS = require("aws-sdk");
 var CONTACT_URL = process.env.CONTACT_URL;
-
+const querySet = {"title":true, "company_id":true, "startKey_id":true, "limit":true};
 function addHateoas(item){
     item["links"] = [
         {"rel":"self", "href":CONTACT_URL+'/'+item.contact_id},
@@ -8,6 +8,30 @@ function addHateoas(item){
         //modi
         {"rel":"company", "href":CONTACT_URL+'/'+item.contact_id+"/company"}
     ];
+}
+function processQuery(query, params){
+    if(query.startKey_id!== undefined){
+        params['ExclusiveStartKey'] = {contact_id:query.startKey_id};
+        delete query["startKey_id"]; 
+    }
+    if(query.limit!== undefined){
+        params['Limit'] = query.limit;
+        delete query["limit"];
+    }
+
+    Object.keys(query).forEach(function(key) {
+        if(querySet[key]!==true){
+            delete query[key]; 
+        }
+        else{
+            if(params['FilterExpression']===undefined)  params['FilterExpression'] = "";
+            else params['FilterExpression']+=" AND ";
+            params['FilterExpression']+= key+"=:"+key;
+            if(params['ExpressionAttributeValues']===undefined) params['ExpressionAttributeValues'] ={};
+            params['ExpressionAttributeValues'][':'+key] = query[key];          
+        }
+    }); 
+    console.log(params);
 }
 exports.create = function(contact) {
     return new Promise(function(resolve, reject) {
@@ -42,12 +66,15 @@ function createID(person_url){
 
 exports.getAll = function(queryStringParameters) {
     return new Promise(function(resolve, reject) {
+        console.log(queryStringParameters);
         var ddb = new AWS.DynamoDB.DocumentClient();
 
         let params = {
             TableName : 'ContactTable',
-            // Limit: 20
+            Limit: 5
         };
+        let queryCopy = JSON.parse(JSON.stringify(queryStringParameters));
+        processQuery(queryCopy, params);
         ddb.scan(params, function(err, data) {
             if (err) {
                 console.log(err);
@@ -58,12 +85,18 @@ exports.getAll = function(queryStringParameters) {
                 for(let i=0; i<data.Items.length; i++){
                     addHateoas(data.Items[i]);  
                 }
-                // if(data.LastEvaluatedKey!==undefined){
-                //     q = req.originalUrl.split("?")[1]===undefined? "":req.originalUrl.split("?")[1]+"&";
-                //     data["links"] = [
-                //         {"rel":"next", "href":CONTACT_URL+"?"+q+"startKey_id="+data.LastEvaluatedKey.person_id}
-                //     ]
-                // }
+                if(data.LastEvaluatedKey!==undefined){
+                    let q = "";
+                    delete queryStringParameters["startKey_id"]; 
+                    for (var key in queryStringParameters) {
+                        if (queryStringParameters.hasOwnProperty(key)) {
+                            q=q+key+"="+queryStringParameters[key]+"&";
+                        }
+                    }
+                    data["links"] = [
+                        {"rel":"next", "href":CONTACT_URL+"?"+q+"startKey_id="+data.LastEvaluatedKey.contact_id}
+                    ]
+                }
                 resolve(data);
             }
         });

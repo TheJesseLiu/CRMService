@@ -152,7 +152,7 @@ exports.getAllContacts = function(queryStringParameters) {
 
 function getAllContactsTask(queryStringParameters) {
 	return new Promise(function(resolve, reject){
-		ContactBO.getAll()
+		ContactBO.getAll(queryStringParameters)
 			.then(
 				function(result){
 					// console.log(result);

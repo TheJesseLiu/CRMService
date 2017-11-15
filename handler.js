@@ -14,7 +14,8 @@ const itemHandlers = {
 
 module.exports.router = (event, context, callback) => {
 	let handlers = (event["pathParameters"] == null) ? collectionHandlers : itemHandlers;
-	let httpMethod = event["httpMethod"];ˇ
+	let httpMethod = event["httpMethod"];
+	console.log(event);
 	if (httpMethod in handlers) {
 		return handlers[httpMethod](event, context, callback);
 	}
@@ -62,6 +63,7 @@ function createContact(event, context, callback) {
 
 
 function getAllContacts(event, context, callback) {
+	console.log(event["queryStringParameters"]);
 	CRM.getAllContacts(event["queryStringParameters"]).then(
 	    function (result) {
 			const response = {
